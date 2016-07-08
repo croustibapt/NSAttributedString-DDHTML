@@ -128,14 +128,37 @@
         if (strncmp("b", (const char *)xmlNode->name, strlen((const char *)xmlNode->name)) == 0 ||
             strncmp("strong", (const char *)xmlNode->name, strlen((const char *)xmlNode->name)) == 0) {
             if (boldFont) {
-                [nodeAttributedString addAttribute:NSFontAttributeName value:boldFont range:nodeAttributedStringRange];
+                UIFont * currentFont = [nodeAttributedString attribute:NSFontAttributeName atIndex:0 effectiveRange:nil];
+                if (currentFont && [currentFont fontDescriptor].symbolicTraits & UIFontDescriptorTraitItalic)
+                {
+                    UIFontDescriptor * fontDescriptor = [[currentFont fontDescriptor] fontDescriptorWithSymbolicTraits:(UIFontDescriptorTraitBold | UIFontDescriptorTraitItalic)];
+                    
+                    UIFont * boldItalicFont = [UIFont fontWithDescriptor:fontDescriptor size:boldFont.pointSize];
+                    [nodeAttributedString addAttribute:NSFontAttributeName value:boldItalicFont range:nodeAttributedStringRange];
+                }
+                else
+                {
+                    [nodeAttributedString addAttribute:NSFontAttributeName value:boldFont range:nodeAttributedStringRange];
+                }
             }
         }
         
         // Italic Tag
-        else if (strncmp("i", (const char *)xmlNode->name, strlen((const char *)xmlNode->name)) == 0) {
+        else if (strncmp("i", (const char *)xmlNode->name, strlen((const char *)xmlNode->name)) == 0 ||
+                 strncmp("em", (const char *)xmlNode->name, strlen((const char *)xmlNode->name)) == 0) {
             if (italicFont) {
-                [nodeAttributedString addAttribute:NSFontAttributeName value:italicFont range:nodeAttributedStringRange];
+                UIFont * currentFont = [nodeAttributedString attribute:NSFontAttributeName atIndex:0 effectiveRange:nil];
+                if (currentFont && [currentFont fontDescriptor].symbolicTraits & UIFontDescriptorTraitBold)
+                {
+                    UIFontDescriptor * fontDescriptor = [[currentFont fontDescriptor] fontDescriptorWithSymbolicTraits:(UIFontDescriptorTraitBold | UIFontDescriptorTraitItalic)];
+                    
+                    UIFont * boldItalicFont = [UIFont fontWithDescriptor:fontDescriptor size:boldFont.pointSize];
+                    [nodeAttributedString addAttribute:NSFontAttributeName value:boldItalicFont range:nodeAttributedStringRange];
+                }
+                else
+                {
+                    [nodeAttributedString addAttribute:NSFontAttributeName value:italicFont range:nodeAttributedStringRange];
+                }
             }
         }
         
@@ -145,7 +168,8 @@
         }
         
         // Stike Tag
-        else if (strncmp("strike", (const char *)xmlNode->name, strlen((const char *)xmlNode->name)) == 0) {
+        else if (strncmp("strike", (const char *)xmlNode->name, strlen((const char *)xmlNode->name)) == 0 ||
+                 strncmp("del", (const char *)xmlNode->name, strlen((const char *)xmlNode->name)) == 0) {
             [nodeAttributedString addAttribute:NSStrikethroughStyleAttributeName value:@(YES) range:nodeAttributedStringRange];
         }
         
